@@ -1,0 +1,28 @@
+{
+    "name": "alexgivi/php-bil24-api",
+    "description": "Bil24 REST API Client for PHP.",
+    "type": "library",
+    "keywords": ["bil24", "rest", "bil24-php", "bil24-rest", "bil24-api"],
+    "require": {
+        "php": ">=5.5.9",
+        "netresearch/jsonmapper": "~1.0",
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=5.7 <6",
+        "mockery/mockery": "^0.9.4",
+        "symfony/var-dumper": "~2.8|~3.0"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Alexey Gevondyan",
+            "email": "alexgivi@nextmail.ru"
+        }
+    ],
+    "autoload": {
+        "psr-4" : {
+            "bil24api\\" : "src"
+        }
+    }
+}
