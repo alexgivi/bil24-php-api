@@ -66,4 +66,19 @@ abstract class BaseRequestObject extends BaseObject
             }
         }
     }
+
+    public function toArray($ignoreProperties = [], $excludeMode = true)
+    {
+        $ret = [];
+        $attributes = get_object_vars($this);
+        $required = static::getRequiredAttributes();
+        foreach ($attributes as $attribute => $value) {
+            if ($value === null && !in_array($attribute, $required)) {
+                continue;
+            }
+            $ret[$attribute] = $value;
+        }
+
+        return $ret;
+    }
 }

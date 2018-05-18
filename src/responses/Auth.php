@@ -7,21 +7,21 @@ use bil24api\BaseResponseObject;
 class Auth extends BaseResponseObject
 {
     /**
-     * id пользователя в БС
+     * id пользователя в БС.
      *
      * @var int
      */
     public $userId;
 
     /**
-     * id сессии пользователя
+     * id сессии пользователя.
      *
      * @var string
      */
     public $sessionId;
 
     /**
-     * тип фронтенда
+     * тип фронтенда.
      *
      * @var int
      */
