@@ -3,13 +3,22 @@
 namespace bil24api;
 
 use bil24api\requests\Auth;
+use bil24api\requests\CancelOrder;
+use bil24api\requests\CreateOrder;
+use bil24api\requests\CreateOrderExt;
 use bil24api\requests\CreateUser;
+use bil24api\requests\GetActionEventsGroupedByTickets;
 use bil24api\requests\GetActionExt;
 use bil24api\requests\GetCart;
 use bil24api\requests\GetCities;
 use bil24api\requests\GetActionsV2;
+use bil24api\requests\GetOrders;
+use bil24api\requests\GetOrdersExt;
 use bil24api\requests\GetSeatList;
+use bil24api\requests\GetTicketsByActionEvent;
+use bil24api\requests\GetTicketsByOrder;
 use bil24api\requests\GetVenues;
+use bil24api\requests\PayOrder;
 use bil24api\requests\Reservation;
 
 /**
@@ -337,5 +346,232 @@ class Client
     public function getCart()
     {
         return $this->exec(GetCart::create($this->configuration), \bil24api\responses\GetCart::class);
+    }
+
+    /**
+     * Создание заказа из забронированных мест.
+     * Для интерфейса Билетная система вместо данного метода необходимо использовать метод createOrderExt().
+     *
+     * Авторизация обязательна.
+     *
+     * @see Client::createOrderExt()
+     *
+     * @param string      $successUrl    редирект на successUrl после успешной оплаты
+     * @param string      $failUrl       редирект на failUrl после НЕуспешной оплаты
+     * @param string|null $email         почта, на которую надо отправить билеты после успешной оплаты (ТОЛЬКО ДЛЯ КАССЫ и ПРИГЛАСИТЕЛЬНЫХ)
+     * @param string|null $phone         номер телефона покупателя (ТОЛЬКО ДЛЯ КАССЫ и ПРИГЛАСИТЕЛЬНЫХ)
+     * @param string|null $fullName      Полное имя покупателя, которое отобразится на билете
+     * @param float|null  $discount      скидка в % (ТОЛЬКО ДЛЯ КАСС И ПРИГЛАСИТЕЛЬНЫХ)
+     * @param float|null  $serviceCharge сервисный сбор в % (ТОЛЬКО ДЛЯ КАСС)
+     *
+     * @return \bil24api\responses\CreateOrder|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function createOrder(
+        $successUrl,
+        $failUrl,
+        $email = null,
+        $phone = null,
+        $fullName = null,
+        $discount = null,
+        $serviceCharge = null
+    )
+    {
+        return $this->exec(CreateOrder::create($this->configuration, [
+            'successUrl' => $successUrl,
+            'failUrl' => $failUrl,
+            'email' => $email,
+            'phone' => $phone,
+            'fullName' => $fullName,
+            'discount' => $discount,
+            'serviceCharge' => $serviceCharge,
+        ]), \bil24api\responses\CreateOrder::class);
+    }
+
+    /**
+     * Создание заказа из забронированных мест.
+     * Используется вместо метода createOrder() для интерфейса Билетная система.
+     * После создания заказ принимает статус NEW.
+     *
+     * Авторизация обязательна.
+     *
+     * @see Client::createOrder()
+     *
+     * @param bool|null   $longReservation true - долговременное бронирование
+     * @param string|null $email           почта, на которую надо отправить билеты после успешной оплаты
+     * @param string|null $phone           номер телефона покупателя
+     * @param string|null $fullName        Полное имя покупателя, которое отобразится на билете
+     *
+     * @return \bil24api\responses\CreateOrderExt|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function createOrderExt($longReservation = null, $email = null, $phone = null, $fullName = null)
+    {
+        return $this->exec(CreateOrderExt::create($this->configuration, [
+            'longReservation' => $longReservation,
+            'email' => $email,
+            'phone' => $phone,
+            'fullName' => $fullName,
+        ]), \bil24api\responses\CreateOrderExt::class);
+    }
+
+    /**
+     * Отмена ранее созданного заказа.
+     * Отменить можно только заказ со статусом NEW.
+     * В результате запроса заказ примет статус CANCELLING или CANCELLED.
+     * При попытке отменить заказ не со статусом NEW, ошибки не произойдет,
+     * статус заказа не изменится, а в ответе придет актуальный статус заказа.
+     * Когда статус заказа примет значение CANCELLED, места, входящие в заказ, станут свободными.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int $orderId id заказа
+     *
+     * @return \bil24api\responses\CancelOrder|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function cancelOrder($orderId)
+    {
+        return $this->exec(CancelOrder::create($this->configuration, [
+            'orderId' => $orderId,
+        ]), \bil24api\responses\CancelOrder::class);
+    }
+
+    /**
+     * Оплата ранее созданного заказа.
+     * Оплатить можно только заказ со статусом NEW.
+     * В результате запроса заказ примет статус PROCESSING или PAID.
+     * При попытке оплатить заказ не со статусом NEW, ошибки не произойдет,
+     * статус заказа не изменится, а в ответе придет актуальный статус заказа.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int $orderId id заказа
+     *
+     * @return \bil24api\responses\PayOrder|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function payOrder($orderId)
+    {
+        return $this->exec(PayOrder::create($this->configuration, [
+            'orderId' => $orderId,
+        ]), \bil24api\responses\PayOrder::class);
+    }
+
+    /**
+     * Получение заказов пользователя.
+     *
+     * Авторизация обязательна.
+     *
+     * @return \bil24api\responses\GetOrders|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getOrders()
+    {
+        return $this->exec(GetOrders::create($this->configuration), \bil24api\responses\GetOrders::class);
+    }
+
+    /**
+     * Получение заказов пользователя.
+     *
+     * Авторизация обязательна.
+     *
+     * @param string $fromDate дата в формате dd.MM.yyyy HH:mm:ss
+     *
+     * @return \bil24api\responses\GetOrdersExt|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getOrdersExt($fromDate)
+    {
+        return $this->exec(GetOrdersExt::create($this->configuration, [
+            'fromDate' => $fromDate,
+        ]), \bil24api\responses\GetOrdersExt::class);
+    }
+
+    /**
+     * Получение списка сеансов, по которым были куплены билеты.
+     *
+     * Авторизация обязательна.
+     *
+     * @return \bil24api\responses\GetActionEventsGroupedByTickets|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getActionEventsGroupedByTickets()
+    {
+        return $this->exec(GetActionEventsGroupedByTickets::create($this->configuration),
+            \bil24api\responses\GetOrdersExt::class);
+    }
+
+    /**
+     * Получение купленных билетов по id представления.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int    $actionEventId id сеанса
+     * @param int    $sizeQrCode    размер Qr кода (задается одна сторона, картинка будет квадратная)
+     * @param int    $widthBarCode  ширина Bar кода
+     * @param int    $heightBarCode высота Bar кода
+     * @param string $type          тип изображения. PNG, JPG
+     *
+     * @return \bil24api\responses\GetTicketsByActionEvent|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getTicketsByActionEvent($actionEventId, $sizeQrCode, $widthBarCode, $heightBarCode, $type)
+    {
+        return $this->exec(GetTicketsByActionEvent::create($this->configuration, [
+            'actionEventId' => $actionEventId,
+            'sizeQrCode' => $sizeQrCode,
+            'widthBarCode' => $widthBarCode,
+            'heightBarCode' => $heightBarCode,
+            'type' => $type,
+        ]), \bil24api\responses\GetTicketsByActionEvent::class);
+    }
+
+    /**
+     * Получение купленных билетов по id представления.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int    $orderId       id заказа
+     * @param int    $sizeQrCode    размер Qr кода (задается одна сторона, картинка будет квадратная)
+     * @param int    $widthBarCode  ширина Bar кода
+     * @param int    $heightBarCode высота Bar кода
+     * @param string $type          тип изображения. PNG, JPG
+     *
+     * @return \bil24api\responses\GetTicketsByOrder|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getTicketsByOrder(
+        $orderId,
+        $sizeQrCode = null,
+        $widthBarCode = null,
+        $heightBarCode = null,
+        $type = null
+    ) {
+        return $this->exec(GetTicketsByOrder::create($this->configuration, [
+            'orderId' => $orderId,
+            'sizeQrCode' => $sizeQrCode,
+            'widthBarCode' => $widthBarCode,
+            'heightBarCode' => $heightBarCode,
+            'type' => $type,
+        ]), \bil24api\responses\GetTicketsByOrder::class);
     }
 }

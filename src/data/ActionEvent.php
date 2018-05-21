@@ -104,6 +104,27 @@ class ActionEvent extends BaseObject
     public $seatList;
 
     /**
+     * кол-во билетов.
+     *
+     * @var int
+     */
+    public $quantity;
+
+    /**
+     * общая сумма билетов.
+     *
+     * @var int
+     */
+    public $sum;
+
+    /**
+     * ссылка на билеты в формате pdf.
+     *
+     * @var int
+     */
+    public $ticketsUrl;
+
+    /**
      * сервисный сбор по сеансу.
      *
      * @var float
