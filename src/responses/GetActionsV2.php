@@ -9,7 +9,7 @@ class GetActionsV2 extends BaseResponseObject
     /**
      * список мероприятий.
      *
-     * @var \bil24api\data\Venue[]
+     * @var \bil24api\data\Action[]
      */
-    public $actionList;
+    public $actionList = [];
 }

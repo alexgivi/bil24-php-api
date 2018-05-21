@@ -89,9 +89,9 @@ class Order extends BaseObject
     /**
      * список билетов.
      *
-     * @var int
+     * @var \bil24api\data\Ticket[]
      */
-    public $ticketList;
+    public $ticketList = [];
 
     /**
      * сообщение пользователю от банка.

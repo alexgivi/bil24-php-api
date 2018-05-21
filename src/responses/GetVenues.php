@@ -11,5 +11,5 @@ class GetVenues extends BaseResponseObject
      *
      * @var \bil24api\data\Venue[]
      */
-    public $venueList;
+    public $venueList = [];
 }

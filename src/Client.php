@@ -4,14 +4,20 @@ namespace bil24api;
 
 use bil24api\requests\Auth;
 use bil24api\requests\CancelOrder;
+use bil24api\requests\CheckKdp;
 use bil24api\requests\CreateOrder;
 use bil24api\requests\CreateOrderExt;
 use bil24api\requests\CreateUser;
+use bil24api\requests\Delete;
 use bil24api\requests\GetActionEventsGroupedByTickets;
 use bil24api\requests\GetActionExt;
 use bil24api\requests\GetCart;
 use bil24api\requests\GetCities;
 use bil24api\requests\GetActionsV2;
+use bil24api\requests\GetEmail;
+use bil24api\requests\GetFilter;
+use bil24api\requests\GetNews;
+use bil24api\requests\GetOrderInfo;
 use bil24api\requests\GetOrders;
 use bil24api\requests\GetOrdersExt;
 use bil24api\requests\GetSeatList;
@@ -20,6 +26,10 @@ use bil24api\requests\GetTicketsByOrder;
 use bil24api\requests\GetVenues;
 use bil24api\requests\PayOrder;
 use bil24api\requests\Reservation;
+use bil24api\requests\GetTicketsByDay;
+use bil24api\requests\GetUserInfo;
+use bil24api\requests\SendTicketsToEmail;
+use bil24api\requests\SetPushToken;
 
 /**
  * Interact bil24 server with REST API.
@@ -544,7 +554,7 @@ class Client
     }
 
     /**
-     * Получение купленных билетов по id представления.
+     * Получение купленных билетов по id заказа.
      *
      * Авторизация обязательна.
      *
@@ -573,5 +583,188 @@ class Client
             'heightBarCode' => $heightBarCode,
             'type' => $type,
         ]), \bil24api\responses\GetTicketsByOrder::class);
+    }
+
+    /**
+     * Получение информации по проданным билетам за конкретный день.
+     *
+     * Авторизация не требуется.
+     *
+     * @param string $date дата в формате dd.MM.yyyy
+     *
+     * @return \bil24api\responses\GetTicketsByDay|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getTicketsByDay($date)
+    {
+        return $this->exec(GetTicketsByDay::create($this->configuration, [
+            'date' => $date,
+        ]), \bil24api\responses\GetTicketsByDay::class);
+    }
+
+    /**
+     * Получение информации о пользователе.
+     *
+     * Авторизация обязательна.
+     *
+     * @return \bil24api\responses\GetUserInfo|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getUserInfo()
+    {
+        return $this->exec(GetUserInfo::create($this->configuration), \bil24api\responses\GetUserInfo::class);
+    }
+
+    /**
+     * Отправка билетов на почту.
+     *
+     * Авторизация обязательна.
+     *
+     * @return \bil24api\responses\SendTicketsToEmail|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function sendTicketsToEmail()
+    {
+        return $this->exec(SendTicketsToEmail::create($this->configuration),
+            \bil24api\responses\SendTicketsToEmail::class);
+    }
+
+    /**
+     * Удаление.
+     * Метод помечает билет/заказ пользователя как удаленный, чтобы на интерфейсах в дальнейшем их не подгружать.
+     * destination = TICKETS_BY_ACTION_EVENT - помечаются как удаленные все билеты пользователя на конкретный сеанс.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int    $id          id элемента, в зависимости от destination
+     * @param string $destination может принимать значения ORDER, TICKET, TICKETS_BY_ACTION_EVENT
+     *
+     * @return \bil24api\responses\Delete|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function delete($id, $destination)
+    {
+        return $this->exec(Delete::create($this->configuration, [
+            'id' => $id,
+            'destination' => $destination,
+        ]), \bil24api\responses\Delete::class);
+    }
+
+    /**
+     * Удаление.
+     * Метод помечает билет/заказ пользователя как удаленный, чтобы на интерфейсах в дальнейшем их не подгружать.
+     * destination = TICKETS_BY_ACTION_EVENT - помечаются как удаленные все билеты пользователя на конкретный сеанс.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int $orderId id заказа
+     *
+     * @return \bil24api\responses\GetOrderInfo|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getOrderInfo($orderId)
+    {
+        return $this->exec(GetOrderInfo::create($this->configuration, [
+            'orderId' => $orderId,
+        ]), \bil24api\responses\GetOrderInfo::class);
+    }
+
+    /**
+     * Получение почты.
+     *
+     * Авторизация обязательна.
+     *
+     * @return \bil24api\responses\GetEmail|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getEmail()
+    {
+        return $this->exec(GetEmail::create($this->configuration), \bil24api\responses\GetEmail::class);
+    }
+
+    /**
+     * Отправка GCM токена на сервер.
+     *
+     * Авторизация обязательна.
+     *
+     * @return \bil24api\responses\SetPushToken|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function setPushToken()
+    {
+        return $this->exec(SetPushToken::create($this->configuration), \bil24api\responses\SetPushToken::class);
+    }
+
+    /**
+     * Получить новости.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int    $time       время новости в мс
+     * @param int    $count      количество новостей (от 1 до 30)
+     * @param string $cursorMode forward - новые новости backward - старые новости
+     *
+     * @return \bil24api\responses\GetNews|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getNews($time, $count, $cursorMode)
+    {
+        return $this->exec(GetNews::create($this->configuration, [
+            'time' => $time,
+            'count' => $count,
+            'cursorMode' => $cursorMode,
+        ]), \bil24api\responses\GetNews::class);
+    }
+
+    /**
+     * Проверка КДП.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int $actionId id представления
+     * @param int $kdp      КДП
+     *
+     * @return \bil24api\responses\CheckKdp|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function checkKdp($actionId, $kdp)
+    {
+        return $this->exec(CheckKdp::create($this->configuration, [
+            'actionId' => $actionId,
+            'kdp' => $kdp,
+        ]), \bil24api\responses\CheckKdp::class);
+    }
+
+    /**
+     * Получение данных для фильтра.
+     *
+     * Авторизация не требуется.
+     *
+     * @return \bil24api\responses\GetFilter|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getFilter()
+    {
+        return $this->exec(GetFilter::create($this->configuration), \bil24api\responses\GetFilter::class);
     }
 }

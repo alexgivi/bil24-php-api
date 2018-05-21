@@ -11,5 +11,5 @@ class GetOrders extends BaseResponseObject
      *
      * @var \bil24api\data\Order[]
      */
-    public $orderList;
+    public $orderList = [];
 }

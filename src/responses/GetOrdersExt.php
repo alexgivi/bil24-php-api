@@ -11,7 +11,7 @@ class GetOrdersExt extends BaseResponseObject
      *
      * @var \bil24api\data\Order[]
      */
-    public $orderList;
+    public $orderList = [];
 
     /**
      * формат даты заказа.

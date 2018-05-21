@@ -9,7 +9,7 @@ class GetActionExt extends BaseResponseObject
     /**
      * представление.
      *
-     * @var \bil24api\data\Venue[]
+     * @var \bil24api\data\Action
      */
-    public $actionList;
+    public $action;
 }

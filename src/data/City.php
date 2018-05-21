@@ -19,4 +19,18 @@ class City extends BaseObject
      * @var string
      */
     public $cityName;
+
+    /**
+     * список представлений.
+     *
+     * @var \bil24api\data\Action[]
+     */
+    public $actionList = [];
+
+    /**
+     * список представлений.
+     *
+     * @var \bil24api\data\Venue[]
+     */
+    public $venueList = [];
 }

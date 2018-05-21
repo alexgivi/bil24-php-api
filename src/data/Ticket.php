@@ -98,6 +98,20 @@ class Ticket extends BaseObject
     public $price;
 
     /**
+     * скидка.
+     *
+     * @var float
+     */
+    public $discount;
+
+    /**
+     * сервисный сбор (СС).
+     *
+     * @var float
+     */
+    public $serviceCharge;
+
+    /**
      * цена билета с учетом СС.
      *
      * @var float
@@ -105,11 +119,11 @@ class Ticket extends BaseObject
     public $totalPrice;
 
     /**
-     * СС.
+     * true – билет возвращен.
      *
-     * @var float
+     * @var boolean
      */
-    public $serviceCharge;
+    public $refunded;
 
     /**
      * Qr код в Base64 в формате переданном в запросе.

@@ -101,7 +101,7 @@ class ActionEvent extends BaseObject
      *
      * @var \bil24api\data\Seat[]
      */
-    public $seatList;
+    public $seatList = [];
 
     /**
      * кол-во билетов.
@@ -161,61 +161,16 @@ class ActionEvent extends BaseObject
     public $eTicket;
 
     /**
-     * наименование типа места проведения.
+     * список категорий, сгруппированных по лимитам (категории без размещения).
      *
-     * @var string
+     * @var \bil24api\data\CategoryLimit[]
      */
-    public $categoryLimitList;
+    public $categoryLimitList = [];
 
     /**
-     * адрес места проведения.
+     * список билетов.
      *
-     * @var string
+     * @var \bil24api\data\Ticket[]
      */
-    public $address;
-
-    /**
-     * строка (##.######).
-     * широта места проведения.
-     *
-     * @var string
-     */
-    public $geoLat;
-
-    /**
-     * строка (##.######).
-     * долгота места проведения.
-     *
-     * @var string
-     */
-    public $geoLon;
-
-    /**
-     * ссылка на изображение места проведения.
-     *
-     * @var string
-     */
-    public $imageUrl;
-
-    /**
-     * описание места проведения.
-     *
-     * @var string
-     */
-    public $description;
-
-    /**
-     * true - место проведения, где действуют скидки и преференции.
-     *
-     * @var boolean
-     */
-    public $cityPass;
-
-    /**
-     * true - место проведения, где действуют скидки и преференции.
-     *
-     * @var boolean
-     */
-    public $actionEventList;
-
+    public $ticketList = [];
 }

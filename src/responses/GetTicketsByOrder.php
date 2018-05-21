@@ -88,6 +88,6 @@ class GetTicketsByOrder extends BaseResponseObject
      *
      * @var \bil24api\data\Ticket[]
      */
-    public $ticketList;
+    public $ticketList = [];
 
 }

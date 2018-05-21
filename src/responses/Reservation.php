@@ -18,7 +18,7 @@ class Reservation extends BaseResponseObject
      *
      * @var \bil24api\data\Seat[]
      */
-    public $seatList;
+    public $seatList = [];
 
     /**
      * Время жизни брони в секундах через которое вся бронь пользователя снимется.

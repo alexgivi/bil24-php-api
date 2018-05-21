@@ -25,5 +25,5 @@ class GetSeatList extends BaseResponseObject
      *
      * @var \bil24api\data\Seat[]
      */
-    public $seatList;
+    public $seatList = [];
 }

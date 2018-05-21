@@ -191,4 +191,10 @@ class Action extends BaseObject
      */
     public $venueList = [];
 
+    /**
+     * список сеансов.
+     *
+     * @var \bil24api\data\ActionEvent[]
+     */
+    public $actionEventList = [];
 }
