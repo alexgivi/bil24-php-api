@@ -3,8 +3,10 @@
 namespace bil24api;
 
 use bil24api\requests\Auth;
+use bil24api\requests\BindEmail;
 use bil24api\requests\CancelOrder;
 use bil24api\requests\CheckKdp;
+use bil24api\requests\ConfirmEmail;
 use bil24api\requests\CreateOrder;
 use bil24api\requests\CreateOrderExt;
 use bil24api\requests\CreateUser;
@@ -29,6 +31,7 @@ use bil24api\requests\Reservation;
 use bil24api\requests\GetTicketsByDay;
 use bil24api\requests\GetUserInfo;
 use bil24api\requests\SendTicketsToEmail;
+use bil24api\requests\SendWiFlyData;
 use bil24api\requests\SetPushToken;
 
 /**
@@ -766,5 +769,72 @@ class Client
     public function getFilter()
     {
         return $this->exec(GetFilter::create($this->configuration), \bil24api\responses\GetFilter::class);
+    }
+
+    /**
+     * WI-FLY.
+     *
+     * Авторизация обязательна.
+     *
+     * @param string $mac mac адрес устройства
+     *
+     * @return \bil24api\responses\SendWiFlyData|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function sendWiFlyData($mac)
+    {
+        return $this->exec(SendWiFlyData::create($this->configuration, [
+            'mac' => $mac,
+        ]), \bil24api\responses\SendWiFlyData::class);
+    }
+
+    /**
+     * Привязка почты.
+     * Чтобы подтвердить почту, необходимо:
+     * 1. выполнить метод BIND_EMAIL. На указанную почту придет код подтверждения.
+     * 2. выполнить CONFIRM_EMAIL с кодом, пришедшим на почту.
+     * В ответе придут данные аккаунта (userId, sessionId), к которым успешно прикреплена почта.
+     * С этими данными необходимо выполнять все последующие запросы
+     *
+     * Авторизация обязательна.
+     *
+     * @param string $email email
+     *
+     * @return \bil24api\responses\BindEmail|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function bindEmail($email)
+    {
+        return $this->exec(BindEmail::create($this->configuration, [
+            'email' => $email,
+        ]), \bil24api\responses\BindEmail::class);
+    }
+
+    /**
+     * Привязка почты.
+     * Чтобы подтвердить почту, необходимо:
+     * 1. выполнить метод BIND_EMAIL. На указанную почту придет код подтверждения.
+     * 2. выполнить CONFIRM_EMAIL с кодом, пришедшим на почту.
+     * В ответе придут данные аккаунта (userId, sessionId), к которым успешно прикреплена почта.
+     * С этими данными необходимо выполнять все последующие запросы
+     *
+     * Авторизация обязательна.
+     *
+     * @param int $code код подтверждения
+     *
+     * @return \bil24api\responses\ConfirmEmail|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function confirmEmail($code)
+    {
+        return $this->exec(ConfirmEmail::create($this->configuration, [
+            'code' => $code,
+        ]), \bil24api\responses\ConfirmEmail::class);
     }
 }
