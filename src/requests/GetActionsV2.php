@@ -16,7 +16,7 @@ class GetActionsV2 extends BaseRequestObject
         return 'GET_ACTIONS_V2';
     }
 
-    public static function getRequiredAttributes()
+    public function getRequiredAttributes()
     {
         return array_merge(parent::getRequiredAttributes(), ['cityId']);
     }

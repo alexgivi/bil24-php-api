@@ -5,9 +5,12 @@ namespace bil24api;
 use bil24api\requests\Auth;
 use bil24api\requests\CreateUser;
 use bil24api\requests\GetActionExt;
+use bil24api\requests\GetCart;
 use bil24api\requests\GetCities;
 use bil24api\requests\GetActionsV2;
+use bil24api\requests\GetSeatList;
 use bil24api\requests\GetVenues;
+use bil24api\requests\Reservation;
 
 /**
  * Interact bil24 server with REST API.
@@ -197,5 +200,142 @@ class Client
             'actionId' => $actionId,
             'userId' => $userId,
         ]), \bil24api\responses\GetActionExt::class);
+    }
+
+    /**
+     * Получение списка мероприятий.
+     * Метод возвращает список представлений по городу.
+     *
+     * Авторизация не требуется.
+     *
+     * @param int       $actionEventId
+     * @param bool|null $availableOnly
+     *
+     * @return \bil24api\responses\GetSeatList|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getSeatList($actionEventId, $availableOnly = null)
+    {
+        return $this->exec(GetSeatList::create($this->configuration, [
+            'actionEventId' => $actionEventId,
+            'availableOnly' => $availableOnly,
+        ]), \bil24api\responses\GetSeatList::class);
+    }
+
+    /**
+     * Бронирование мест в схеме зала с размещением.
+     * Перед созданием заказа необходимо забронировать хотя бы одно место.
+     * При получении ошибки в ответе гарантируется, что ни одно место
+     * из списка не было забронировано (транзакционные свойства бронирования).
+     * Если список мест содержит ранее успешно забронированные места, они исключаются из списка.
+     * Все места в списке должны принадлежать одному сеансу.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int[]    $seatList список id мест для брони.
+     * @param int|null $kdp      код доступа к представлению (КДП).
+     *
+     * @return \bil24api\responses\Reservation|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function reservationByPlace($seatList, $kdp = null)
+    {
+        return $this->exec(Reservation::create($this->configuration, [
+            'type' => Reservation::TYPE_RESERVE_BY_PLACE,
+            'seatList' => $seatList,
+            'kdp' => $kdp,
+        ]), \bil24api\responses\Reservation::class);
+    }
+
+    /**
+     * Бронирование мест в схеме зала без размещения.
+     * Перед созданием заказа необходимо забронировать хотя бы одно место.
+     * При получении ошибки в ответе гарантируется, что ни одно место
+     * из спискане было забронировано (транзакционные свойства бронирования).
+     * Бронирование производится указанием ценовой категории и количества мест в данной категории.
+     * При одновременном бронировании мест в нескольких ценовых категориях,
+     * все ценовые категории должны принадлежать одному сеансу.
+     * Ценовые категории должны быть без размещения,
+     * в противном случае необходимо использовать метод бронирования мест в схеме зала с размещением.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int[]    $categoryQuantityMap key - id категории, value - кол-во мест для брони.
+     * @param int|null $kdp                 код доступа к представлению (КДП).
+     *
+     * @return \bil24api\responses\Reservation|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function reservationByPriceCategory($categoryQuantityMap, $kdp = null)
+    {
+        return $this->exec(Reservation::create($this->configuration, [
+            'type' => Reservation::TYPE_RESERVE,
+            'categoryQuantityMap' => $categoryQuantityMap,
+            'kdp' => $kdp,
+        ]), \bil24api\responses\Reservation::class);
+    }
+
+    /**
+     * Разбронирование места.
+     * Передается список мест, которые необходимо убрать из забронированных.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int[] $seatList список id мест.
+     *
+     * @return \bil24api\responses\Reservation|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function unreserve($seatList)
+    {
+        return $this->exec(Reservation::create($this->configuration, [
+            'type' => Reservation::TYPE_UN_RESERVE,
+            'seatList' => $seatList,
+        ]), \bil24api\responses\Reservation::class);
+    }
+
+    /**
+     * Разбронирование всех мест.
+     * Можно передать id сеанса, с которого снимается бронь.
+     * Если не передавать id сеанса, то бронь снимается со всех забронированных мест.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int|null $actionEventId id сеанса.
+     *
+     * @return \bil24api\responses\Reservation|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function unreserveAll($actionEventId = null)
+    {
+        return $this->exec(Reservation::create($this->configuration, [
+            'type' => Reservation::TYPE_UN_RESERVE,
+            'actionEventId' => $actionEventId,
+        ]), \bil24api\responses\Reservation::class);
+    }
+
+    /**
+     * Метод возвращает места, забронированные пользователям, сгруппированные по сеансу.
+     *
+     * Авторизация обязательна.
+     *
+     * @return \bil24api\responses\GetCart|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getCart()
+    {
+        return $this->exec(GetCart::create($this->configuration), \bil24api\responses\GetCart::class);
     }
 }

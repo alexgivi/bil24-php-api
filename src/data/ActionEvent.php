@@ -34,6 +34,83 @@ class ActionEvent extends BaseObject
     public $time;
 
     /**
+     * id представления.
+     *
+     * @var int
+     */
+    public $actionId;
+
+    /**
+     * краткое наименование представления.
+     *
+     * @var string
+     */
+    public $actionName;
+
+    /**
+     * полное наименование представления.
+     *
+     * @var string
+     */
+    public $fullActionName;
+
+    /**
+     * url постера (320 х 335).
+     *
+     * @var string
+     */
+    public $smallPosterUrl;
+
+    /**
+     * url постера (640 х 670).
+     *
+     * @var string
+     */
+    public $bigPosterUrl;
+
+    /**
+     * id города, переданный в запросе.
+     *
+     * @var int
+     */
+    public $cityId;
+
+    /**
+     * наименование города.
+     *
+     * @var string
+     */
+    public $cityName;
+
+    /**
+     * id места проведения.
+     *
+     * @var int
+     */
+    public $venueId;
+
+    /**
+     * наименование места проведения.
+     *
+     * @var string
+     */
+    public $venueName;
+
+    /**
+     * список забронированных мест.
+     *
+     * @var \bil24api\data\Seat[]
+     */
+    public $seatList;
+
+    /**
+     * сервисный сбор по сеансу.
+     *
+     * @var float
+     */
+    public $serviceCharge;
+
+    /**
      * id схемы зала.
      *
      * @var int

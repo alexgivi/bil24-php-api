@@ -50,7 +50,7 @@ abstract class BaseRequestObject extends BaseObject
         return $object;
     }
 
-    public static function getRequiredAttributes()
+    public function getRequiredAttributes()
     {
         return ['versionCode', 'fid', 'token', 'command'];
     }
@@ -60,7 +60,7 @@ abstract class BaseRequestObject extends BaseObject
      */
     public function check()
     {
-        foreach (static::getRequiredAttributes() as $attribute) {
+        foreach ($this->getRequiredAttributes() as $attribute) {
             if (empty($this->$attribute)) {
                 throw new Bil24Exception("$attribute not set", Bil24Exception::UNKNOWN_ERROR);
             }
@@ -71,7 +71,7 @@ abstract class BaseRequestObject extends BaseObject
     {
         $ret = [];
         $attributes = get_object_vars($this);
-        $required = static::getRequiredAttributes();
+        $required = $this->getRequiredAttributes();
         foreach ($attributes as $attribute => $value) {
             if ($value === null && !in_array($attribute, $required)) {
                 continue;

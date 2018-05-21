@@ -26,7 +26,7 @@ class GetActionExt extends BaseRequestObject
         return 'GET_ACTION_EXT';
     }
 
-    public static function getRequiredAttributes()
+    public function getRequiredAttributes()
     {
         return array_merge(parent::getRequiredAttributes(), ['cityId', 'actionId']);
     }

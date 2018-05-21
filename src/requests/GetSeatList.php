@@ -4,25 +4,25 @@ namespace bil24api\requests;
 
 use bil24api\BaseRequestObject;
 
-class GetVenues extends BaseRequestObject
+class GetSeatList extends BaseRequestObject
 {
     /**
      * @var int
      */
-    public $cityId;
+    public $actionEventId;
 
     /**
-     * @var int
+     * @var boolean
      */
-    public $venueTypeId;
+    public $availableOnly;
 
     public static function getCommand()
     {
-        return 'GET_VENUES';
+        return 'GET_SEAT_LIST';
     }
 
     public function getRequiredAttributes()
     {
-        return array_merge(parent::getRequiredAttributes(), ['cityId']);
+        return array_merge(parent::getRequiredAttributes(), ['actionEventId']);
     }
 }

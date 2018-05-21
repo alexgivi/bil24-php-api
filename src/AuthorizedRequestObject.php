@@ -18,7 +18,7 @@ abstract class AuthorizedRequestObject extends BaseRequestObject
      */
     public $sessionId;
 
-    public static function getRequiredAttributes()
+    public function getRequiredAttributes()
     {
         return array_merge(parent::getRequiredAttributes(), ['userId', 'sessionId']);
     }
