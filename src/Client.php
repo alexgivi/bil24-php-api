@@ -18,6 +18,7 @@ use bil24api\requests\GetCities;
 use bil24api\requests\GetActionsV2;
 use bil24api\requests\GetEmail;
 use bil24api\requests\GetFilter;
+use bil24api\requests\GetMecs;
 use bil24api\requests\GetNews;
 use bil24api\requests\GetOrderInfo;
 use bil24api\requests\GetOrders;
@@ -27,6 +28,7 @@ use bil24api\requests\GetTicketsByActionEvent;
 use bil24api\requests\GetTicketsByOrder;
 use bil24api\requests\GetVenues;
 use bil24api\requests\PayOrder;
+use bil24api\requests\RefundTickets;
 use bil24api\requests\Reservation;
 use bil24api\requests\GetTicketsByDay;
 use bil24api\requests\GetUserInfo;
@@ -815,12 +817,7 @@ class Client
     }
 
     /**
-     * Привязка почты.
-     * Чтобы подтвердить почту, необходимо:
-     * 1. выполнить метод BIND_EMAIL. На указанную почту придет код подтверждения.
-     * 2. выполнить CONFIRM_EMAIL с кодом, пришедшим на почту.
-     * В ответе придут данные аккаунта (userId, sessionId), к которым успешно прикреплена почта.
-     * С этими данными необходимо выполнять все последующие запросы
+     * Подтверждение почты.
      *
      * Авторизация обязательна.
      *
@@ -837,4 +834,52 @@ class Client
             'code' => $code,
         ]), \bil24api\responses\ConfirmEmail::class);
     }
+
+    /**
+     * Получение карт (МЭК).
+     *
+     * Авторизация обязательна.
+     *
+     * @param int      $sizeQrCode    размер Qr кода (задается одна сторона, картинка будет квадратная)
+     * @param int      $widthBarCode  ширина Bar кода
+     * @param int      $heightBarCode высота Bar кода
+     * @param int|null $mecId         id карты. Поле используется для экономии трафика в основном на мобильных фронтендах.
+     *                                Если передать данное поле в запросе, то в ответ вернутся карты с id большим чем переданный в запросе.
+     *                                Подразумевается, что карты с id <= mecId хранятся локально и не требуются в повторной загрузке.
+     *
+     * @return \bil24api\responses\GetMecs|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function getMecs($sizeQrCode, $widthBarCode, $heightBarCode, $mecId = null)
+    {
+        return $this->exec(GetMecs::create($this->configuration, [
+            'sizeQrCode' => $sizeQrCode,
+            'widthBarCode' => $widthBarCode,
+            'heightBarCode' => $heightBarCode,
+            'mecId' => $mecId,
+        ]), \bil24api\responses\GetMecs::class);
+    }
+
+    /**
+     * Возврат билетов.
+     * Повторный запрос на отмену билета не вернет ошибку, а вернет текущий статус билета.
+     *
+     * Авторизация обязательна.
+     *
+     * @param int[] $ticketIdSet список id билетов.
+     *
+     * @return \bil24api\responses\RefundTickets|object
+     *
+     * @throws Bil24Exception
+     * @throws \JsonMapper_Exception
+     */
+    public function refundTickets($ticketIdSet)
+    {
+        return $this->exec(RefundTickets::create($this->configuration, [
+            'ticketIdSet' => $ticketIdSet,
+        ]), \bil24api\responses\RefundTickets::class);
+    }
+
 }
